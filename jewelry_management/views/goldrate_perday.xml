@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="goldrate_perday_action" model="ir.actions.act_window">
+        <field name="name">GoldRate per Day</field>
+        <field name="res_model">goldrate_perday.jewelry</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face"></p>    
+        </field>
+    </record>  
+
+    <record id="goldrate_perday_view_tree" model="ir.ui.view">
+        <field name="name">goldrate_perday.view.tree</field>
+        <field name="model">goldrate_perday.jewelry</field>
+        <field name="arch" type="xml">
+            <tree string="goldrate_perday" editable="bottom">
+                <field name="date"/>
+                <field name="gold_rate"/>
+                <button name="min_cron_jewellery" type="object" string="Update"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

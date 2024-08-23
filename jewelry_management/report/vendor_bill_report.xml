@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <template id="invoice_report_jewelry_inherit_id" inherit_id="account.report_invoice_document">
+            <xpath expr="//table[1]/thead/tr[1]/th[2]" position="before">
+                <th style="width: 120px;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <span style="white-space: nowrap;">Purity</span>
+                    </div>
+                </th>
+                  <th style="width: 120px;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <span style="white-space: nowrap;">Weight (gm) </span>
+                    </div>
+                </th>
+
+                <th style="width: 120px;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <span style="white-space: nowrap;">Product Weight (gm)</span>
+                    </div>
+                </th>
+<!--                <th style="width: 120px;">-->
+<!--                    <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+<!--                        <span style="white-space: nowrap;">Stone Weight</span>-->
+<!--                    </div>-->
+<!--                </th>-->
+<!--                <th style="width: 120px;">-->
+<!--                    <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+<!--                        <span style="white-space: nowrap;">Net Weight</span>-->
+<!--                    </div>-->
+<!--                </th>-->
+<!--                <th style="width: 120px;">-->
+<!--                    <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+<!--                        <span style="white-space: nowrap;">Stone Rate</span>-->
+<!--                    </div>-->
+<!--                </th>-->
+
+
+
+                <th style="width: 120px;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <span style="white-space: nowrap;">Gold Waste</span>
+                    </div>
+                </th>
+                  <th style="width: 120px;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <span style="white-space: nowrap;">Making Charge per (gm)</span>
+                    </div>
+                </th>
+                  <th style="width: 120px;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <span style="white-space: nowrap;">Labour Charge</span>
+                    </div>
+                </th>
+
+            </xpath>
+
+
+            <xpath expr="//td[@name='td_quantity']" position="before">
+                <t t-if="line.vendor_purity_id">
+                    <td>
+                        <span t-field="line.vendor_purity_id"/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                        <span>-</span>
+                    </td>
+                </t>
+
+
+                   <t t-if="line.vendor_gold_weight">
+                    <td>
+                        <span t-field="line.vendor_gold_weight" t-options='{"widget": "float", "precision": 2}'/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                        <span>-</span>
+                    </td>
+                </t>
+
+
+                <t t-if="line.vendor_product_weight">
+                    <td>
+                        <span t-field="line.vendor_product_weight" t-options='{"widget": "float", "precision": 2}'/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                        <span>-</span>
+                    </td>
+                </t>
+
+<!--                <t t-if="line.vendor_stone_weight">-->
+<!--                    <td>-->
+<!--                        <span t-field="line.vendor_stone_weight" t-options='{"widget": "float", "precision": 2}'/>-->
+<!--                    </td>-->
+<!--                </t>-->
+<!--                <t t-else="">-->
+<!--                    <td style="height: 20px !important; width: 120px !important;text-align:center">-->
+<!--                        <span>-</span>-->
+<!--                    </td>-->
+<!--                </t>-->
+
+<!--                <t t-if="line.vendor_net_weight">-->
+<!--                    <td>-->
+<!--                        <span t-field="line.vendor_net_weight" t-options='{"widget": "float", "precision": 2}'/>-->
+<!--                    </td>-->
+<!--                </t>-->
+<!--                <t t-else="">-->
+<!--                    <td style="height: 20px !important; width: 120px !important;text-align:center">-->
+<!--                        <span>-</span>-->
+<!--                    </td>-->
+<!--                </t>-->
+
+<!--                <t t-if="line.vendor_stone_rate">-->
+<!--                    <td>-->
+<!--                        <span t-field="line.vendor_stone_rate" t-options='{"widget": "float", "precision": 2}'/>-->
+<!--                    </td>-->
+<!--                </t>-->
+<!--                <t t-else="">-->
+<!--                    <td style="height: 20px !important; width: 120px !important;text-align:center">-->
+<!--                        <span>-</span>-->
+<!--                    </td>-->
+<!--                </t>-->
+
+
+
+                <t t-if="line.vendor_gold_waste">
+                    <td>
+                        <span t-field="line.vendor_gold_waste" t-options='{"widget": "float", "precision": 2}'/>%
+                    </td>
+                </t>
+                <t t-else="">
+                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                        <span>-</span>
+                    </td>
+                </t>
+
+                  <t t-if="line.making_charge">
+                    <td>
+                        <span t-field="line.making_charge" t-options='{"widget": "float", "precision": 2}'/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                        <span>-</span>
+                    </td>
+                </t>
+                 <t t-if="line.labour_charge">
+                    <td>
+                        <span t-field="line.labour_charge" t-options='{"widget": "float", "precision": 2}'/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                        <span>-</span>
+                    </td>
+                </t>
+
+            </xpath>
+
+            <xpath expr="//table[1]" position="after">
+                <t t-if="o.metal_line_ids">
+                    <br/>
+                    <strong style="display: flex; align-items: center; justify-content: flex-start;">Metal Payment
+                    </strong>
+                    <br/>
+                    <table class="table table-sm o_main_table table-borderless" name="metal_line_table">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">
+                                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <span style="white-space: nowrap;">Product</span>
+                                    </div>
+                                </th>
+                                <th style="width: 120px;">
+                                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <span style="white-space: nowrap;">Metal</span>
+                                    </div>
+                                </th>
+                                <th style="width: 120px;">
+                                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <span style="white-space: nowrap;">Purity</span>
+                                    </div>
+                                </th>
+                                <th style="width: 120px;">
+                                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <span style="white-space: nowrap;">Weight</span>
+                                    </div>
+                                </th>
+                                <th style="width: 120px;">
+                                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <span style="white-space: nowrap;">Unit Price</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.metal_line_ids" t-as="metal_line">
+                                <tr>
+                                <t t-if="metal_line.product_id">
+                                    <td>
+                                        <span t-field="metal_line.product_id"/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                                        <span>-</span>
+                                    </td>
+                                </t>
+
+                                <t t-if="metal_line.metal">
+                                    <td>
+                                        <span t-field="metal_line.metal"/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                                        <span>-</span>
+                                    </td>
+                                </t>
+                                <t t-if="metal_line.purity_id">
+                                    <td>
+                                        <span t-field="metal_line.purity_id"/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                                        <span>-</span>
+                                    </td>
+                                </t>
+                                <t t-if="metal_line.product_weight">
+                                    <td>
+                                        <span t-field="metal_line.product_weight"
+                                              t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                                        <span>-</span>
+                                    </td>
+                                </t>
+                                <t t-if="metal_line.unit_price">
+                                    <td>
+                                        <span t-field="metal_line.unit_price"
+                                              t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td style="height: 20px !important; width: 120px !important;text-align:center">
+                                        <span>-</span>
+                                    </td>
+                                </t>
+                            </tr></t>
+
+                        </tbody>
+
+                    </table>
+                </t>
+            </xpath>
+
+        </template>
+
+    </data>
+</odoo>

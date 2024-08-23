@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sale_portal_content" name="template_sale_portal_content" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//th[@id='product_name_header']" position="after">
+            <th class="text-start" name="product_purity_id">Purity</th>
+            <th class="text-start" name="product_weight">Product Weight</th>
+            <!-- <th class="text-start" name="product_stone_weight">Stone Weight</th> -->
+            <!-- <th class="text-start" name="product_net_weight">Net Weight</th> -->
+            <th class="text-start" name="making_charge">Making Charge %</th>
+            <th class="text-start" name="gold_waste">Gold Waste</th>
+        </xpath>
+
+        <xpath expr="//td[@id='product_name']" position="after">
+            <td name="product_purity_id" class="text-center">
+            <span t-field="line.product_purity_id"></span></td>
+            <td name="product_weight" class="text-center"><span t-field="line.product_weight"></span></td>
+            <!-- <td name="product_stone_weight" class="text-center"><span t-field="line.product_stone_weight"></span></td> -->
+            <!-- <td name="product_net_weight" class="text-center"><span t-field="line.product_net_weight"></span></td> -->
+            <td name="making_charge" class="text-center"><span t-field="line.making_charge"></span></td>
+            <td name="gold_waste" class="text-center"><span t-field="line.gold_waste"></span></td>
+        </xpath>
+    </template>
+</odoo>

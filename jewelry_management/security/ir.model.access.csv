@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_jewelry_management,metal.line ,model_metal_line,,1,1,1,1
+access_pragtech_making_charge,making_charge ,model_making_charge,,1,1,1,1
+access_pragtech_purity,purity ,model_purity,,1,1,1,1
+access_pragtech_goldrate_perday,goldrate_perday.jewelry,model_goldrate_perday_jewelry,,1,1,1,1
+
+
+
+
+
+

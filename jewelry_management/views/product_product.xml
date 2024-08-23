@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+<!--    <record id="product_jewelery_form_view" model="ir.ui.view">-->
+<!--        <field name="name">product.product.jewelry</field>-->
+<!--        <field name="model">product.product</field>-->
+<!--        <field name="inherit_id" ref="product.product_normal_form_view"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='detailed_type']" position="before">-->
+<!--                <field name="purity"/>-->
+<!--                <field name="making_charge_id"/>-->
+<!--                <field name="making_charges_percentages"/>-->
+<!--            </xpath>-->
+
+<!--            <xpath expr="//div[@name='weight']" position="after">-->
+<!--                <field name="stone_weight" invisible="1"/>-->
+<!--                <field name="net_weight" invisible="1"/>-->
+<!--            </xpath>-->
+
+<!--            <xpath expr="//field[@name='taxes_id']" position="before">-->
+<!--                <field name="stone_rate" invisible="1"/>-->
+<!--            </xpath>-->
+
+<!--            <xpath expr="//field[@name='uom_id']" position="before">-->
+<!--                <field name="gold_weight"/>-->
+<!--            </xpath>-->
+
+<!--            &lt;!&ndash;            <xpath expr="//div[@name='lst_price']" position="after">&ndash;&gt;-->
+<!--            &lt;!&ndash;                <field name="gold_weight"/>&ndash;&gt;-->
+<!--            &lt;!&ndash;            </xpath>&ndash;&gt;-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="product_jewelery_tree_view" model="ir.ui.view">
+        <field name="name">product.product.jewelry.tree</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="weight"/>
+                <!--                <field name="stone_weight" invisible="1"/>-->
+                <!--                <field name="net_weight" invisible="1"/>-->
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_jewelery_kanban_view" model="ir.ui.view">
+        <field name="name">product.product.jewelry.kanban</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='product_lst_price']" position="after">
+                <div class="mt-1">
+                    Weight:
+                    <field name="weight"/>
+                </div>
+                <!--                <div class="mt-1">-->
+                <!--                    Stone Weight:-->
+                <!--                    <field name="stone_weight"/>-->
+                <!--                </div>-->
+
+                <!--                <div class="mt-1">-->
+                <!--                    Net Weight:-->
+                <!--                    <field name="net_weight"/>-->
+                <!--                </div>-->
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_gold_form_view" model="ir.ui.view">
+        <field name="name">product.template.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="priority">5</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='detailed_type']" position="before">
+                <field name="purity"/>
+                <field name="making_charge_id"/>
+                <field name="making_charges_percentages"/>
+            </xpath>
+
+            <xpath expr="//field[@name='uom_id']" position="before">
+                <field name="gold_weight"/>
+                <field name="gold_waste"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

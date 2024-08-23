@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="purchase_jewelery_form_view" model="ir.ui.view">
+        <field name="name">purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='effective_date']" position="after">
+                <field name="gold_rate"/>
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page[1]/field[@name='order_line']/tree/field[@name='name']"
+                   position="after">
+                <field name="product_purity_id" readonly="1"/>
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page[1]/field[@name='order_line']/tree/field[@name='product_qty']"
+                   position="after">
+                <field name="gold_weight"/>
+                <field name="product_weight"/>
+                <field name="product_stone_weight" column_invisible="True"/>
+                <field name="product_net_weight" column_invisible="True"/>
+                <field name="product_stone_rate" column_invisible="True"/>
+                <field name="gold_waste"/>
+                <field name="gold_rate"/>
+                <field name="making_charge"/>
+                <field name="labour_charge"/>
+            </xpath>
+
+
+        </field>
+    </record>
+
+    <record id="view_jewelry_receipt_form" model="ir.ui.view">
+        <field name="name">view.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_id']" position="after">
+                <field name="receipt_purity_id"/>
+                <field name="receipt_gold_weight"/>
+                <field name="receipt_product_weight"/>
+                <field name="receipt_stone_weight" column_invisible="True"/>
+                <field name="receipt_net_weight" column_invisible="True"/>
+                <field name="receipt_gold_waste"/>
+            </xpath>
+            <field name="receipt_purity_id" position="after">
+                <field name="quantity" position="move"/>
+            </field>
+
+
+        </field>
+    </record>
+
+    <record id="view_account_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']" position="after">
+                <field name="vendor_purity_id"/>
+
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="after">
+                <field name="vendor_gold_weight"/>
+                <field name="vendor_product_weight"/>
+                <field name="vendor_stone_weight" column_invisible="True"/>
+                <field name="vendor_net_weight" column_invisible="True"/>
+                <field name="vendor_stone_rate" column_invisible="True"/>
+                <field name="vendor_gold_waste"/>
+                <field name="making_charge"/>
+                <field name="labour_charge"/>
+            </xpath>
+
+
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='account_id']" position="after">
+                <field name="vendor_purity_id"/>
+                <field name="vendor_gold_weight"/>
+                <field name="vendor_product_weight"/>
+                <field name="vendor_stone_weight" column_invisible="True"/>
+                <field name="vendor_net_weight" column_invisible="True"/>
+                <field name="vendor_stone_rate" column_invisible="True"/>
+                <field name="vendor_gold_waste"/>
+                <field name="making_charge"/>
+                <field name="labour_charge"/>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='invoice_tab']" position="after">
+                <page id="metal_tab" name="metal_tab" string="Metal Lines">
+                    <field name="metal_line_ids" string="Metal Lines" widget="one2many_list"
+                           options="{'no_create': True, 'no_create_edit': True}">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="metal"/>
+                            <field name="purity_id"/>
+                            <field name="quantity"/>
+                            <field name="gold_weight"/>
+                            <field name="product_weight"/>
+                            <field name="unit_price"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <field name="metal_return"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

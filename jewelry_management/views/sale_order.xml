@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="sale_jewelery_form_view" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="gold_rate"/>
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page[1]/field[@name='order_line']/tree/field[@name='name']"
+                   position="after">
+                <field name="product_purity_id" />
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page[1]/field[@name='order_line']/tree/field[@name='product_uom_qty']"
+                   position="after">
+                <field name="gold_weight" readonly="1"/>
+                <field name="product_weight" readonly="1"/>
+                <field name="product_stone_weight" readonly="1" column_invisible="True"/>
+                <field name="product_net_weight" readonly="1" column_invisible="True"/>
+                <field name="product_stone_rate" readonly="1" column_invisible="True"/>
+                <field name="making_charge" readonly="1"/>
+                <field name="labour_charge" readonly="1"/>
+                <field name="gold_waste"/>
+                <field name="gold_rate"/>
+
+
+            </xpath>
+
+
+        </field>
+    </record>
+
+
+</odoo>

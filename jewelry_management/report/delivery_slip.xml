@@ -1,0 +1,327 @@
+<odoo>
+
+    <template id="deliveryorder_document_inherit" inherit_id="stock.report_delivery_document">
+        <xpath expr="//table//tr/th[1]" position="after">
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Purity</span>
+                </div>
+            </th>
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Weight(gm)</span>
+                </div>
+            </th>
+
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Product Weight(gm)</span>
+                </div>
+            </th>
+            <!--            <th style="width: 120px;">-->
+            <!--                <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+            <!--                    <span style="white-space: nowrap;">Stone Weight</span>-->
+            <!--                </div>-->
+            <!--            </th>-->
+            <!--            <th style="width: 120px;">-->
+            <!--                <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+            <!--                    <span style="white-space: nowrap;">Net Weight</span>-->
+            <!--                </div>-->
+            <!--            </th>-->
+
+
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Gold Waste</span>
+                </div>
+            </th>
+        </xpath>
+
+        <!-- <xpath expr="//table[@class='table table-sm']//tbody//tr//td[1]" position="after"> -->
+        <xpath expr="//table[hasclass('table-sm')]//tbody//tr//td[1]" position="after">
+            <td>
+                <t t-if="move.receipt_purity_id">
+                    <span t-field="move.receipt_purity_id"/>
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+
+            <td>
+                <t t-if="move.receipt_gold_weight">
+                    <span t-field="move.receipt_gold_weight" t-options='{"widget": "float", "precision": 2}'/>
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+
+            <td>
+                <t t-if="move.receipt_product_weight">
+                    <span t-field="move.receipt_product_weight" t-options='{"widget": "float", "precision": 2}'/>
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+            <!--            <td>-->
+            <!--                <t t-if="move.receipt_stone_weight">-->
+            <!--                    <span t-field="move.receipt_stone_weight" t-options='{"widget": "float", "precision": 2}'/>-->
+            <!--                </t>-->
+            <!--                <t t-else="">-->
+            <!--                    <span>-</span>-->
+            <!--                </t>-->
+            <!--            </td>-->
+            <!--            <td>-->
+            <!--                <t t-if="move.receipt_net_weight">-->
+            <!--                    <span t-field="move.receipt_net_weight" t-options='{"widget": "float", "precision": 2}'/>-->
+            <!--                </t>-->
+            <!--                <t t-else="">-->
+            <!--                    <span>-</span>-->
+            <!--                </t>-->
+            <!--            </td>-->
+
+
+            <td>
+                <t t-if="move.receipt_gold_waste">
+                    <span t-field="move.receipt_gold_waste" t-options='{"widget": "float", "precision": 2}'/>%
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+        </xpath>
+
+        <xpath expr="//table[@name='stock_move_line_table']/thead/tr/th[@name='th_sml_quantity']" position="after">
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Purity</span>
+                </div>
+            </th>
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Weight (gm)</span>
+                </div>
+            </th>
+
+
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Product Weight (gm)</span>
+                </div>
+            </th>
+            <!--            <th style="width: 120px;">-->
+            <!--                <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+            <!--                    <span style="white-space: nowrap;">Stone Weight</span>-->
+            <!--                </div>-->
+            <!--            </th>-->
+            <!--            <th style="width: 120px;">-->
+            <!--                <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+            <!--                    <span style="white-space: nowrap;">Net Weight</span>-->
+            <!--                </div>-->
+            <!--            </th>-->
+
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Gold Waste</span>
+                </div>
+            </th>
+
+        </xpath>
+    </template>
+
+
+<template id="stock_report_delivery_aggregated_move_lines_pacific_paragon"
+          inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+    <xpath expr="//tr" position="replace">
+    
+    <span t-foreach="o.move_line_ids" t-as="line">
+       <tr>
+       <td>
+                <span t-if="line.product_id.name">
+                  
+                    <span t-esc="line.product_id.name"/>
+                   
+                </span>
+             </td> 
+             <td>
+                <span t-if="line.quantity">
+                  
+                    <span t-esc="line.quantity"/>
+                   
+                </span>
+             </td> 
+             <td>
+                <span t-if="line.quantity">
+                  
+                    <span t-esc="line.quantity"/>
+                   
+                </span>
+             </td> 
+          <td>
+                <span t-if="line.receipt_purity_id">
+                  
+                    <span t-esc="line.receipt_purity_id.purity_values"/>
+                   
+                </span>
+             </td>    
+        <td>
+                <span t-if="line.receipt_gold_weight">
+                    <span t-esc="line.receipt_gold_weight" t-options='{"widget": "float", "precision": 2}'/>
+                </span>
+        </td>
+
+        <td>
+                <span t-if="line.receipt_product_weight">
+                    <span t-esc="line.receipt_product_weight" t-options='{"widget": "float", "precision": 2}'/>
+                </span>
+        </td>
+
+        <!-- Add other fields here with similar structure -->
+
+        <td>
+                <span t-if="line.receipt_gold_waste">
+                    <span t-esc="line.receipt_gold_waste" t-options='{"widget": "float", "precision": 2}'/>%
+                </span>
+        </td>
+        </tr>
+       </span> 
+       
+    </xpath>
+</template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <template id="report_picking_jewewlw" inherit_id="stock.report_picking">
+        <xpath expr="(//table[hasclass('table-sm')])[1]/thead/tr/th[1]" position="after">
+
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Purity</span>
+                </div>
+            </th>
+
+              <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">weight (gm)</span>
+                </div>
+            </th>
+
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Product Weight (gm)</span>
+                </div>
+            </th>
+            <!--            <th style="width: 120px;">-->
+            <!--                <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+            <!--                    <span style="white-space: nowrap;">Stone Weight</span>-->
+            <!--                </div>-->
+            <!--            </th>-->
+            <!--            <th style="width: 120px;">-->
+            <!--                <div style="display: flex; align-items: center; justify-content: flex-start;">-->
+            <!--                    <span style="white-space: nowrap;">Net Weight</span>-->
+            <!--                </div>-->
+            <!--            </th>-->
+
+
+
+            <th style="width: 120px;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <span style="white-space: nowrap;">Gold Waste </span>
+                </div>
+            </th>
+
+        </xpath>
+
+        <xpath expr="//table[hasclass('table-sm')]//tbody//tr//td[1]" position="after">
+            <td>
+                <t t-if="ml.move_id.receipt_purity_id">
+                    <span t-field="ml.move_id.receipt_purity_id"/>
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+               <td>
+                <t t-if="ml.move_id.receipt_gold_weight">
+                    <span t-field="ml.move_id.receipt_gold_weight" t-options='{"widget": "float", "precision": 2}'/>
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+
+            <td>
+                <t t-if="ml.move_id.receipt_product_weight">
+                    <span t-field="ml.move_id.receipt_product_weight" t-options='{"widget": "float", "precision": 2}'/>
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+            <!--            <td>-->
+            <!--                <t t-if="ml.move_id.receipt_stone_weight">-->
+            <!--                    <span t-field="ml.move_id.receipt_stone_weight" t-options='{"widget": "float", "precision": 2}'/>-->
+            <!--                </t>-->
+            <!--                <t t-else="">-->
+            <!--                    <span>-</span>-->
+            <!--                </t>-->
+            <!--            </td>-->
+            <!--            <td>-->
+            <!--                <t t-if="ml.move_id.receipt_net_weight">-->
+            <!--                    <span t-field="ml.move_id.receipt_net_weight" t-options='{"widget": "float", "precision": 2}'/>-->
+            <!--                </t>-->
+            <!--                <t t-else="">-->
+            <!--                    <span>-</span>-->
+            <!--                </t>-->
+            <!--            </td>-->
+
+
+
+            <td>
+                <t t-if="ml.move_id.receipt_gold_waste">
+                    <span t-field="ml.move_id.receipt_gold_waste" t-options='{"widget": "float", "precision": 2}'/>%
+                </t>
+                <t t-else="">
+                    <span>-</span>
+                </t>
+            </td>
+        </xpath>
+
+    </template>
+
+</odoo>

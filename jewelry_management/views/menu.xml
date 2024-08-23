@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+           
+        <menuitem 
+            id="making_charge_menuroot"
+            name="Making Style" 
+            action="making_charge_action" 
+            parent="sale.product_menu_catalog"
+            sequence="150"/>
+        <menuitem
+            id="purity_menuroot_sale"
+            name="Jewellery Purity"
+            action="purity_action"
+            parent="sale.product_menu_catalog"
+            sequence="155"/>
+        <menuitem
+            id="goldrate_perday_menuroot_sale"
+            name="GoldRate/Day"
+            action="goldrate_perday_action"
+            parent="sale.product_menu_catalog"
+            sequence="156"/>
+
+        <menuitem 
+            id="making_charge_menuroot_purchase"
+            name="Making Style" 
+            action="jewelry_management.making_charge_action" 
+            parent="purchase.menu_purchase_products"
+            sequence="100"/>
+        <menuitem
+            id="purity_menuroot_purchase"
+            name="Jewellery Purity"
+            action="purity_action"
+            parent="purchase.menu_purchase_products"
+            sequence="102"/>
+        <menuitem
+            id="goldrate_perday_menuroot_purchase"
+            name="GoldRate/Day"
+            action="goldrate_perday_action"
+            parent="purchase.menu_purchase_products"
+            sequence="103"/>
+
+        <menuitem 
+            id="making_charge_menuroot_inventory"
+            name="Making Style" 
+            action="making_charge_action" 
+            parent="stock.menu_stock_inventory_control"
+            sequence="150"/>  
+        <menuitem
+            id="purity_menuroot_stock"
+            name="Jewellery Purity"
+            action="purity_action"
+            parent="stock.menu_stock_inventory_control"
+            sequence="152"/>
+        <menuitem
+            id="goldrate_perday_menuroot_inventory"
+            name="GoldRate/Day"
+            action="goldrate_perday_action"
+            parent="stock.menu_stock_inventory_control"
+            sequence="156"/>
+
+         
+    </data>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Sale Order report-->
+    <template id="jewelry_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//th[@name='th_quantity']" position="before">
+            <th name="product_purity_id" class="text-start">Purity</th>
+            <th name="gold_waste" class="text-end">Weight (gm) </th>
+            <th name="product_weight" class="text-end">Product Weight (gm) </th>
+<!--            <th name="product_stone_weight" class="text-end">Stone Weight</th>-->
+<!--            <th name="product_net_weight" class="text-end">Net Weight</th>-->
+            <th name="making_charge" class="text-end">Making Charge per (gm)</th>
+            <th name="labour_charge" class="text-end">Labour Charge</th>
+<!--            <th name="stone_rate" class="text-end">Stone Rate </th>-->
+            <th name="gold_waste" class="text-end">Gold Waste </th>
+        </xpath>
+        <xpath expr="//td[@name='td_quantity']" position="before">
+            <td name="product_purity_id" class="text-center">
+            <span t-field="line.product_purity_id"></span></td>
+            <td name="gold_weight" class="text-center">
+             <span t-field="line.gold_weight" t-options='{"widget": "percentage", "precision": 2}'></span>
+            </td>
+            <td name="product_weight" class="text-center"><span t-field="line.product_weight" t-options='{"widget": "float", "precision": 2}'></span></td>
+<!--            <td name="product_stone_weight" class="text-center"><span t-field="line.product_stone_weight" t-options='{"widget": "float", "precision": 2}'></span></td>-->
+<!--            <td name="product_net_weight" class="text-center"><span t-field="line.product_net_weight" t-options='{"widget": "float", "precision": 2}'></span></td>-->
+            <td name="making_charge" class="text-center"><span t-field="line.making_charge" ></span></td>
+            <td name="labour_charge" class="text-center"><span t-field="line.labour_charge" ></span></td>
+<!--            <td name="stone_rate" class="text-center"><span t-field="line.product_stone_rate" t-options='{"widget": "float", "precision": 2}'></span></td>-->
+            <!-- <td name="gold_waste" class="text-center"><span t-field="line.gold_waste" t-options='{"widget": "float", "precision": 2}'></span></td> -->
+
+            <td name="gold_waste" class="text-center">
+             <span t-field="line.gold_waste" t-options='{"widget": "percentage", "precision": 2}'></span>%
+            </td>
+
+        </xpath>
+    </template>
+
+</odoo>

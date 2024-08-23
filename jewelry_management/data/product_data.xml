@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="product_fine_gold_product" model="product.product">
+        <field name="name">Fine Gold</field>
+        <field name="type">product</field>
+    </record>
+
+    <record id="seq_metal_stock_picking" model="ir.sequence">
+        <field name="name">Metal Stock Sale Picking Sequence</field>
+        <field name="code">metal.line</field>
+        <field name="prefix">METAL/IN/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_metal_stock_purchase_picking" model="ir.sequence">
+        <field name="name">Metal Stock Purchase Picking Sequence</field>
+        <field name="code">metal.line.purchase</field>
+        <field name="prefix">METAL/OUT/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+
+</odoo>
