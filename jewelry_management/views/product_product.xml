@@ -37,12 +37,55 @@
         <field name="inherit_id" ref="product.product_product_tree_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
-                <field name="weight"/>
+<!--                <field name="gold_weight"/>-->
+                     <field name="gold_value" sum="Total_Value"  optional="show" />
+
                 <!--                <field name="stone_weight" invisible="1"/>-->
                 <!--                <field name="net_weight" invisible="1"/>-->
             </xpath>
         </field>
     </record>
+
+
+        <record id="product_product_stock_tree_inherited" model="ir.ui.view">
+            <field name="name">product.product</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="stock.product_product_stock_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='free_qty']" position="before">
+<!--                     <field name="gold_weight" sum="Total_Weight"  optional="show" />-->
+                     <field name="gold_value" sum="Total_Value"  optional="show" />
+
+                  </xpath>
+
+                <xpath expr="//field[@name='incoming_qty']" position="after">
+<!--                     <field name="gold_weight" sum="Total_Weight"  optional="show" />-->
+                     <field name="gold_value_incoming" sum="Total_Value"  optional="show" />
+
+                  </xpath>
+
+
+
+            </field>
+        </record>
+
+
+        <record id="product_search_form_view_stock_report_inherited_purity" model="ir.ui.view">
+            <field name="name">product.product</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="stock.product_search_form_view_stock_report"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//search//group" position="inside">
+
+                    <filter string="Product Purity" name="purity_group" domain="[]" context="{'group_by' : 'purity'}"/>
+
+
+                </xpath>
+
+            </field>
+        </record>
 
     <record id="product_jewelery_kanban_view" model="ir.ui.view">
         <field name="name">product.product.jewelry.kanban</field>

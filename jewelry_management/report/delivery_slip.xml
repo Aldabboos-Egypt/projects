@@ -161,9 +161,10 @@
              </td> 
           <td>
                 <span t-if="line.receipt_purity_id">
-                  
-                    <span t-esc="line.receipt_purity_id.purity_values"/>
-                   
+
+                    <span t-esc="line.receipt_purity_id.name"/>
+<!--                    <span t-esc="line.receipt_purity_id.purity_values"/>-->
+
                 </span>
              </td>    
         <td>

@@ -33,37 +33,40 @@ class PurchaseOrder(models.Model):
     @api.depends('order_line.taxes_id', 'order_line.price_subtotal', 'amount_total', 'amount_untaxed')
     def _compute_tax_totals(self):
         for order in self:
-            order_lines = order.order_line.filtered(lambda x: not x.display_type)
-            order.tax_totals = self.env['account.tax']._prepare_tax_totals(
-                [x._convert_to_tax_base_line_dict() for x in order_lines],
-                order.currency_id or order.company_id.currency_id,
-            )
-            groups_by_subtotal = order.tax_totals.get('groups_by_subtotal', {})
-            total_tax_rate = 0
-            total_tax_groups = 0
-            for group in groups_by_subtotal.get('Untaxed Amount', []):
-                tax_rate = group.get('tax_group_amount', 0) / group.get('tax_group_base_amount', 1)
-                total_tax_rate += tax_rate
-                total_tax_groups += 1
-            if total_tax_groups != 0:
-                average_tax_rate = total_tax_rate / total_tax_groups
-                average_tax_rate_percentage = average_tax_rate * 100
-            if 'Untaxed Amount' in order.tax_totals['groups_by_subtotal']:
-                tax_amount = order.tax_totals['groups_by_subtotal']['Untaxed Amount'][0]
-                tax_amount['tax_group_amount'] = order.tax_totals.get('amount_untaxed') * (average_tax_rate_percentage / 100)
-                formatted_tax_group_amount = '${:,.2f}'.format(tax_amount['tax_group_amount'])
-                tax_amount['formatted_tax_group_amount'] = formatted_tax_group_amount
-                formatted_tax_group_base_amount = '${:,.2f}'.format(order.tax_totals.get('amount_untaxed'))
-                tax_amount['formatted_tax_group_base_amount'] = formatted_tax_group_base_amount
-                order.tax_totals['amount_total'] = order.tax_totals.get('amount_untaxed') + tax_amount['tax_group_amount']
-                formatted_amount_total = '${:,.2f}'.format(order.tax_totals['amount_total'])
-                order.tax_totals['formatted_amount_total'] = formatted_amount_total
-            for line in order.order_line:
-                for tax in line.taxes_id:
-                    tax_amount = (line.price_subtotal * tax.amount/100) + line.price_subtotal
-                    line.sudo().write({'price_total': tax_amount})
-            order.write({'amount_total': order.tax_totals['amount_total']
-                    })
+            try:
+                order_lines = order.order_line.filtered(lambda x: not x.display_type)
+                order.tax_totals = self.env['account.tax']._prepare_tax_totals(
+                    [x._convert_to_tax_base_line_dict() for x in order_lines],
+                    order.currency_id or order.company_id.currency_id,
+                )
+                groups_by_subtotal = order.tax_totals.get('groups_by_subtotal', {})
+                total_tax_rate = 0
+                total_tax_groups = 0
+                for group in groups_by_subtotal.get('Untaxed Amount', []):
+                    tax_rate = group.get('tax_group_amount', 0) / group.get('tax_group_base_amount', 1)
+                    total_tax_rate += tax_rate
+                    total_tax_groups += 1
+                if total_tax_groups != 0:
+                    average_tax_rate = total_tax_rate / total_tax_groups
+                    average_tax_rate_percentage = average_tax_rate * 100
+                if 'Untaxed Amount' in order.tax_totals['groups_by_subtotal']:
+                    tax_amount = order.tax_totals['groups_by_subtotal']['Untaxed Amount'][0]
+                    tax_amount['tax_group_amount'] = order.tax_totals.get('amount_untaxed') * (average_tax_rate_percentage / 100)
+                    formatted_tax_group_amount = '${:,.2f}'.format(tax_amount['tax_group_amount'])
+                    tax_amount['formatted_tax_group_amount'] = formatted_tax_group_amount
+                    formatted_tax_group_base_amount = '${:,.2f}'.format(order.tax_totals.get('amount_untaxed'))
+                    tax_amount['formatted_tax_group_base_amount'] = formatted_tax_group_base_amount
+                    order.tax_totals['amount_total'] = order.tax_totals.get('amount_untaxed') + tax_amount['tax_group_amount']
+                    formatted_amount_total = '${:,.2f}'.format(order.tax_totals['amount_total'])
+                    order.tax_totals['formatted_amount_total'] = formatted_amount_total
+                for line in order.order_line:
+                    for tax in line.taxes_id:
+                        tax_amount = (line.price_subtotal * tax.amount/100) + line.price_subtotal
+                        line.sudo().write({'price_total': tax_amount})
+                order.write({'amount_total': order.tax_totals['amount_total']
+                        })
+            except:
+                pass
                          
     @api.onchange('partner_id')
     def match_date(self):        
@@ -87,6 +90,15 @@ class PurchaseOrderLine(models.Model):
     making_charge = fields.Float(string='Making Charge per (gm)')
     labour_charge = fields.Float(string='Labour Charge')
     gold_weight = fields.Float(string='Weight (gm)')
+
+
+    @api.onchange('product_id', 'product_uom_qty', 'product_purity_id','gold_rate')
+    def _onchange_product_purity(self):
+        if self.product_id and self.product_purity_id:
+            # Convert purity to an integer
+            purity_value = self.product_purity_id.purity_values
+            # Calculate the unit price using the formula (rate_24 * purity) / 24
+            self.price_unit = (self.gold_rate * purity_value)
 
 
     @api.model_create_multi
@@ -245,6 +257,17 @@ class AccountMove(models.Model):
 
     )
     metal_return = fields.Many2one('stock.picking' , string='Metal Line Transfer' , readonly=True , copy=False)
+    gold_rate = fields.Float(string='Gold Rate (gm)')
+
+    @api.onchange('partner_id')
+    def match_date(self):
+        order_date = self.env['goldrate_perday.jewelry'].search([])
+        for dates in order_date:
+            if self.invoice_date  == dates.date:
+                self.gold_rate = dates.gold_rate
+
+
+
 
 
     @api.depends_context('lang')
@@ -264,93 +287,96 @@ class AccountMove(models.Model):
             Only set on invoices.
         """
         for move in self:
-            if move.is_invoice(include_receipts=True):
-                base_lines = move.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
-                base_line_values_list = [line._convert_to_tax_base_line_dict() for line in base_lines]
-                sign = move.direction_sign
-                if move.id:
-                    # The invoice is stored so we can add the early payment discount lines directly to reduce the
-                    # tax amount without touching the untaxed amount.
-                    base_line_values_list += [
-                        {
-                            **line._convert_to_tax_base_line_dict(),
-                            'handle_price_include': False,
-                            'quantity': 1.0,
-                            'price_unit': sign * line.amount_currency,
-                        }
-                        for line in move.line_ids.filtered(lambda line: line.display_type == 'epd')
-                    ]
 
-                kwargs = {
-                    'base_lines': base_line_values_list,
-                    'currency': move.currency_id or move.journal_id.currency_id or move.company_id.currency_id,
-                }
+            try:
+                if move.is_invoice(include_receipts=True):
+                    base_lines = move.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
+                    base_line_values_list = [line._convert_to_tax_base_line_dict() for line in base_lines]
+                    sign = move.direction_sign
+                    if move.id:
+                        # The invoice is stored so we can add the early payment discount lines directly to reduce the
+                        # tax amount without touching the untaxed amount.
+                        base_line_values_list += [
+                            {
+                                **line._convert_to_tax_base_line_dict(),
+                                'handle_price_include': False,
+                                'quantity': 1.0,
+                                'price_unit': sign * line.amount_currency,
+                            }
+                            for line in move.line_ids.filtered(lambda line: line.display_type == 'epd')
+                        ]
 
-                if move.id:
-                    kwargs['tax_lines'] = [
-                        line._convert_to_tax_line_dict()
-                        for line in move.line_ids.filtered(lambda line: line.display_type == 'tax')
-                    ]
-                else:
-                    # In case the invoice isn't yet stored, the early payment discount lines are not there. Then,
-                    # we need to simulate them.
-                    epd_aggregated_values = {}
-                    for base_line in base_lines:
-                        if not base_line.epd_needed:
-                            continue
-                        for grouping_dict, values in base_line.epd_needed.items():
-                            epd_values = epd_aggregated_values.setdefault(grouping_dict, {'price_subtotal': 0.0})
-                            epd_values['price_subtotal'] += values['price_subtotal']
+                    kwargs = {
+                        'base_lines': base_line_values_list,
+                        'currency': move.currency_id or move.journal_id.currency_id or move.company_id.currency_id,
+                    }
 
-                    for grouping_dict, values in epd_aggregated_values.items():
-                        taxes = None
-                        if grouping_dict.get('tax_ids'):
-                            taxes = self.env['account.tax'].browse(grouping_dict['tax_ids'][0][2])
+                    if move.id:
+                        kwargs['tax_lines'] = [
+                            line._convert_to_tax_line_dict()
+                            for line in move.line_ids.filtered(lambda line: line.display_type == 'tax')
+                        ]
+                    else:
+                        # In case the invoice isn't yet stored, the early payment discount lines are not there. Then,
+                        # we need to simulate them.
+                        epd_aggregated_values = {}
+                        for base_line in base_lines:
+                            if not base_line.epd_needed:
+                                continue
+                            for grouping_dict, values in base_line.epd_needed.items():
+                                epd_values = epd_aggregated_values.setdefault(grouping_dict, {'price_subtotal': 0.0})
+                                epd_values['price_subtotal'] += values['price_subtotal']
 
-                        kwargs['base_lines'].append(self.env['account.tax']._convert_to_tax_base_line_dict(
-                            None,
-                            partner=move.partner_id,
-                            currency=move.currency_id,
-                            taxes=taxes,
-                            price_unit=values['price_subtotal'],
-                            quantity=1.0,
-                            account=self.env['account.account'].browse(grouping_dict['account_id']),
-                            analytic_distribution=values.get('analytic_distribution'),
-                            price_subtotal=values['price_subtotal'],
-                            is_refund=move.move_type in ('out_refund', 'in_refund'),
-                            handle_price_include=False,
+                        for grouping_dict, values in epd_aggregated_values.items():
+                            taxes = None
+                            if grouping_dict.get('tax_ids'):
+                                taxes = self.env['account.tax'].browse(grouping_dict['tax_ids'][0][2])
 
-                        ))
-                kwargs['is_company_currency_requested'] = move.currency_id != move.company_id.currency_id
-                move.tax_totals = self.env['account.tax']._prepare_tax_totals(**kwargs)
-                labour_charge_sum = sum(move.invoice_line_ids.mapped('labour_charge'))
-                # move.tax_totals['amount_untaxed'] +=labour_charge_sum
-                groups_by_subtotal = move.tax_totals.get('groups_by_subtotal', {})
-                total_tax_rate = 0
-                total_tax_groups = 0
-                for group in groups_by_subtotal.get('Untaxed Amount', []):
-                    tax_rate = group.get('tax_group_amount', 0) / group.get('tax_group_base_amount', 1)
-                    total_tax_rate += tax_rate
-                    total_tax_groups += 1
-                if total_tax_groups != 0:
-                    average_tax_rate = total_tax_rate / total_tax_groups
-                    average_tax_rate_percentage = average_tax_rate * 100
-                if 'Untaxed Amount' in move.tax_totals['groups_by_subtotal']:
-                    tax_amount = move.tax_totals['groups_by_subtotal']['Untaxed Amount'][0]
-                    tax_amount['tax_group_amount'] = move.tax_totals.get('amount_untaxed') * (average_tax_rate_percentage / 100)
-                    formatted_tax_group_amount = '${:,.2f}'.format(tax_amount['tax_group_amount'])
-                    tax_amount['formatted_tax_group_amount'] = formatted_tax_group_amount
-                    formatted_tax_group_base_amount = '${:,.2f}'.format(move.tax_totals.get('amount_untaxed'))
-                    tax_amount['formatted_tax_group_base_amount'] = formatted_tax_group_base_amount
-                    move.tax_totals['amount_total'] = move.tax_totals.get('amount_untaxed') + tax_amount['tax_group_amount']
-                    formatted_amount_total = '${:,.2f}'.format(move.tax_totals['amount_total'])
-                    move.tax_totals['formatted_amount_total'] = formatted_amount_total
-                for line in move.invoice_line_ids:
-                    for tax in line.tax_ids:
-                        tax_amount = (line.price_subtotal * tax.amount/100) + line.price_subtotal
-                        line.write({'price_total': tax_amount})
-                move.write({'amount_total': move.tax_totals['amount_total']})
+                            kwargs['base_lines'].append(self.env['account.tax']._convert_to_tax_base_line_dict(
+                                None,
+                                partner=move.partner_id,
+                                currency=move.currency_id,
+                                taxes=taxes,
+                                price_unit=values['price_subtotal'],
+                                quantity=1.0,
+                                account=self.env['account.account'].browse(grouping_dict['account_id']),
+                                analytic_distribution=values.get('analytic_distribution'),
+                                price_subtotal=values['price_subtotal'],
+                                is_refund=move.move_type in ('out_refund', 'in_refund'),
+                                handle_price_include=False,
 
+                            ))
+                    kwargs['is_company_currency_requested'] = move.currency_id != move.company_id.currency_id
+                    move.tax_totals = self.env['account.tax']._prepare_tax_totals(**kwargs)
+                    labour_charge_sum = sum(move.invoice_line_ids.mapped('labour_charge'))
+                    # move.tax_totals['amount_untaxed'] +=labour_charge_sum
+                    groups_by_subtotal = move.tax_totals.get('groups_by_subtotal', {})
+                    total_tax_rate = 0
+                    total_tax_groups = 0
+                    for group in groups_by_subtotal.get('Untaxed Amount', []):
+                        tax_rate = group.get('tax_group_amount', 0) / group.get('tax_group_base_amount', 1)
+                        total_tax_rate += tax_rate
+                        total_tax_groups += 1
+                    if total_tax_groups != 0:
+                        average_tax_rate = total_tax_rate / total_tax_groups
+                        average_tax_rate_percentage = average_tax_rate * 100
+                    if 'Untaxed Amount' in move.tax_totals['groups_by_subtotal']:
+                        tax_amount = move.tax_totals['groups_by_subtotal']['Untaxed Amount'][0]
+                        tax_amount['tax_group_amount'] = move.tax_totals.get('amount_untaxed') * (average_tax_rate_percentage / 100)
+                        formatted_tax_group_amount = '${:,.2f}'.format(tax_amount['tax_group_amount'])
+                        tax_amount['formatted_tax_group_amount'] = formatted_tax_group_amount
+                        formatted_tax_group_base_amount = '${:,.2f}'.format(move.tax_totals.get('amount_untaxed'))
+                        tax_amount['formatted_tax_group_base_amount'] = formatted_tax_group_base_amount
+                        move.tax_totals['amount_total'] = move.tax_totals.get('amount_untaxed') + tax_amount['tax_group_amount']
+                        formatted_amount_total = '${:,.2f}'.format(move.tax_totals['amount_total'])
+                        move.tax_totals['formatted_amount_total'] = formatted_amount_total
+                    for line in move.invoice_line_ids:
+                        for tax in line.tax_ids:
+                            tax_amount = (line.price_subtotal * tax.amount/100) + line.price_subtotal
+                            line.write({'price_total': tax_amount})
+                    move.write({'amount_total': move.tax_totals['amount_total']})
+            except:
+                pass
             #     if move.invoice_cash_rounding_id:
             #         rounding_amount = move.invoice_cash_rounding_id.compute_difference(move.currency_id,
             #                                                                            move.tax_totals['amount_total'])
@@ -507,6 +533,18 @@ class AccountMoveLine(models.Model):
     vendor_gold_waste = fields.Float(string='Gold Waste %', readonly=True)
     making_charge = fields.Float(string='Making Charge per (gm)', readonly=True)
     labour_charge = fields.Float(string='Labour Charge', readonly=True)
+    gold_rate = fields.Float(related='move_id.gold_rate',string='Gold Rate (gm)')
+
+    @api.onchange( 'vendor_purity_id','gold_rate')
+    def _onchange_product_purity(self):
+
+        print("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd")
+        if self.product_id and self.vendor_purity_id:
+            # Convert purity to an integer
+            purity_value = self.vendor_purity_id.purity_values
+            # Calculate the unit price using the formula (rate_24 * purity) / 24
+            self.price_unit = (self.gold_rate * purity_value)
+
 
 
     @api.onchange('product_id','quantity','name','vendor_gold_weight')

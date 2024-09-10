@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Pragtech Jewellery Management',
-    'version': '0.1',
+    'version': '17.5',
     'category': 'Services',
     'author': 'Pragmatic TechSoft Pvt Ltd.',
     'website': 'pragtech.co.in',

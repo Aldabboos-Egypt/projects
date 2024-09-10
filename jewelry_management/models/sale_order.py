@@ -25,37 +25,41 @@ class SaleOrder(models.Model):
     @api.depends('order_line.tax_id', 'order_line.price_unit', 'amount_total', 'amount_untaxed', 'currency_id','order_line.labour_charge')
     def _compute_tax_totals(self):
         for order in self:
-            order_lines = order.order_line.filtered(lambda x: not x.display_type)
-            order.tax_totals = self.env['account.tax']._prepare_tax_totals(
-                [x._convert_to_tax_base_line_dict() for x in order_lines],
-                order.currency_id or order.company_id.currency_id,
-            )
-            groups_by_subtotal = order.tax_totals.get('groups_by_subtotal', {})
-            total_tax_rate = 0
-            total_tax_groups = 0
-            for group in groups_by_subtotal.get('Untaxed Amount', []):
-                tax_rate = group.get('tax_group_amount', 0) / group.get('tax_group_base_amount', 1)
-                total_tax_rate += tax_rate
-                total_tax_groups += 1
-            if total_tax_groups != 0:
-                average_tax_rate = total_tax_rate / total_tax_groups
-                average_tax_rate_percentage = average_tax_rate * 100
-            if 'Untaxed Amount' in order.tax_totals['groups_by_subtotal']:
-                tax_amount = order.tax_totals['groups_by_subtotal']['Untaxed Amount'][0]
-                tax_amount['tax_group_amount'] = order.tax_totals.get('amount_untaxed') * (average_tax_rate_percentage / 100)
-                formatted_tax_group_amount = '${:,.2f}'.format(tax_amount['tax_group_amount'])
-                tax_amount['formatted_tax_group_amount'] = formatted_tax_group_amount
-                formatted_tax_group_base_amount = '${:,.2f}'.format(order.tax_totals.get('amount_untaxed'))
-                tax_amount['formatted_tax_group_base_amount'] = formatted_tax_group_base_amount
-                order.tax_totals['amount_total'] = order.tax_totals.get('amount_untaxed') + tax_amount['tax_group_amount']
-                formatted_amount_total = '${:,.2f}'.format(order.tax_totals['amount_total'])
-                order.tax_totals['formatted_amount_total'] = formatted_amount_total
-            for line in order.order_line:
-                for tax in line.tax_id:
-                    tax_amount = (line.price_subtotal * tax.amount/100) + line.price_subtotal
-                    line.write({'price_total': tax_amount})
-            order.write({'amount_total': order.tax_totals['amount_total']
-                    })
+            try:
+                order_lines = order.order_line.filtered(lambda x: not x.display_type)
+                order.tax_totals = self.env['account.tax']._prepare_tax_totals(
+                    [x._convert_to_tax_base_line_dict() for x in order_lines],
+                    order.currency_id or order.company_id.currency_id,
+                )
+                groups_by_subtotal = order.tax_totals.get('groups_by_subtotal', {})
+                total_tax_rate = 0
+                total_tax_groups = 0
+                for group in groups_by_subtotal.get('Untaxed Amount', []):
+                        tax_rate = group.get('tax_group_amount', 0) / group.get('tax_group_base_amount', 1)
+                        total_tax_rate += tax_rate
+                        total_tax_groups += 1
+
+                if total_tax_groups != 0:
+                    average_tax_rate = total_tax_rate / total_tax_groups
+                    average_tax_rate_percentage = average_tax_rate * 100
+                if 'Untaxed Amount' in order.tax_totals['groups_by_subtotal']:
+                    tax_amount = order.tax_totals['groups_by_subtotal']['Untaxed Amount'][0]
+                    tax_amount['tax_group_amount'] = order.tax_totals.get('amount_untaxed') * (average_tax_rate_percentage / 100)
+                    formatted_tax_group_amount = '${:,.2f}'.format(tax_amount['tax_group_amount'])
+                    tax_amount['formatted_tax_group_amount'] = formatted_tax_group_amount
+                    formatted_tax_group_base_amount = '${:,.2f}'.format(order.tax_totals.get('amount_untaxed'))
+                    tax_amount['formatted_tax_group_base_amount'] = formatted_tax_group_base_amount
+                    order.tax_totals['amount_total'] = order.tax_totals.get('amount_untaxed') + tax_amount['tax_group_amount']
+                    formatted_amount_total = '${:,.2f}'.format(order.tax_totals['amount_total'])
+                    order.tax_totals['formatted_amount_total'] = formatted_amount_total
+                for line in order.order_line:
+                    for tax in line.tax_id:
+                        tax_amount = (line.price_subtotal * tax.amount/100) + line.price_subtotal
+                        line.write({'price_total': tax_amount})
+                order.write({'amount_total': order.tax_totals['amount_total']
+                        })
+            except:
+                pass
         # for order in self:
         #     order_lines = order.order_line.filtered(lambda x: not x.display_type)
         #     order.tax_totals = self.env['account.tax']._prepare_tax_totals(
@@ -85,6 +89,16 @@ class SaleOrderOrderLine(models.Model):
     gold_waste = fields.Float(string='Gold Waste %')
     gold_rate = fields.Float(related='order_id.gold_rate',string='Gold Rate (gm)')
     gold_weight = fields.Float(string='Weight (gm) ')
+
+
+    @api.onchange('product_id', 'product_uom_qty', 'product_purity_id','gold_rate')
+    def _onchange_product_purity(self):
+        if self.product_id and self.product_purity_id:
+            # Convert purity to an integer
+            purity_value = self.product_purity_id.purity_values
+            # Calculate the unit price using the formula (rate_24 * purity) / 24
+            self.price_unit = (self.gold_rate * purity_value)
+
 
 
     @api.onchange('product_id','product_uom_qty')
